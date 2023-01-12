@@ -51,7 +51,7 @@ router.put('/:id', (req, res) => {
     },
   })
   .then((category) => {
-    return Category.findAll({where: {category_id: req.params.i} });
+    return Category.findAll({where: {category_id: req.params.id} });
   })
   .then((categoryProducts) => {
     const categoryProductsIds = categoryProducts.map(({product_id}) => product_id);
