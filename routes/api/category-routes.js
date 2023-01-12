@@ -45,7 +45,37 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
+  Category.update(req.body, {
+    where: {
+      id: req.params.id,
+    },
+  })
+  .then((category) => {
+    return Category.findAll({where: {category_id: req.params.i} });
+  })
+  .then((categoryProducts) => {
+    const categoryProductsIds = categoryProducts.map(({product_id}) => product_id);
+    const newCategoryProductTags = req.body.product_id
+      .filter((product_id) => !categoryProductsIds.includes(product_id))
+      .map((product_id) => {
+        return {
+          category_id: req.params.id,
+          product_id,
+        };
+      });
+      const categoryProductsToRemove = categoryProducts
+        .filter(({product_id}) => !req.body.productIds.includes(product_id))
+        .map(({ id }) => id);
 
+        return Promise.all([
+          CategoryProduct.destroy({ where: { id: categoryProductsToRemove} }),
+          CategoryProduct.bulkCreate(newCategoryTags),
+        ]);
+  })
+  .then((updatedCategoryTags) => res.json(updatedCategoryTags))
+  .catch((err) => {
+    res.status(400).json(err);
+  });
 });
 
 router.delete('/:id', async (req, res) => {
